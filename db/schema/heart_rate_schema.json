@@ -1,0 +1,20 @@
+{
+  "bsonType": "object",
+  "required": ["user_id", "timestamp", "heart_rate"],
+  "properties": {
+    "user_id": {
+      "bsonType": "string",
+      "description": "must be a string and is required"
+    },
+    "timestamp": {
+      "bsonType": "date",
+      "description": "must be a date and is required"
+    },
+    "heart_rate": {
+      "bsonType": "int",
+      "minimum": 30,
+      "maximum": 200,
+      "description": "must be an integer in the range 30-200 and is required"
+    }
+  }
+}
