@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 
 # Path to the directory where the files are extracted
-data_dir = '/Users/nilmonfortvila/Desktop/UDE/IOT/mit-bih-polysomnographic-database-1.0.0'  # Replace with the actual path
+data_dir = '/Users/nil/Desktop//mit-bih-polysomnographic-database-1.0.0'  # Replace with the actual path
 
 # List of all records in the directory
 records = [f.split('.')[0] for f in os.listdir(data_dir) if f.endswith('.hea')]

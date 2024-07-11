@@ -2,7 +2,7 @@ import mne
 import os
 
 # Path to the downloaded EDF file
-file_path = '/Users/nilmonfortvila/Desktop/UDE/IOT/backend/SC4111E0-PSG.edf'  # Replace with your actual file path
+file_path = '/Users/nil/Desktop/SC4111E0-PSG.edf'  # Replace with your actual file path
 
 # Load the EDF file
 raw = mne.io.read_raw_edf(file_path, preload=True, stim_channel='Event marker')

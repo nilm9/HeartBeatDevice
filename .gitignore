@@ -1,3 +1,6 @@
 /mit-bih-polysomnographic-database-1.0.0/
 /preprocessed_heart_rate_data.csv
 /backend/extracted_features.csv
+.env
+cronogram
+/backend/sleep_stage_model.pkl

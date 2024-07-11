@@ -1,17 +1,18 @@
 from influxdb_client import InfluxDBClient
 import os
+from dotenv import load_dotenv
 
-# brew services stop influxdb
+load_dotenv()
+
 def setup_influxdb():
-    # Token should be securely stored, here we use an environment variable for demonstration
-    token = 'mTiidoiHw2X7h5sOlVwyUeMTdXGeFedLfseFlBmqTEAVJcoa5yk3ZGwgN_gSTLMLhOfxJOz5E_ADXkulhsEouw=='
-    org = "None"  # Replace with your organization name
-    url = "http://localhost:8086"
+    token = os.getenv('INFLUXDB_TOKEN')
+    org = os.getenv('INFLUXDB_ORG')
+    url = os.getenv('INFLUXDB_URL')
+    bucket_name = os.getenv('INFLUXDB_BUCKET')
 
     client = InfluxDBClient(url=url, token=token, org=org)
     buckets_api = client.buckets_api()
 
-    bucket_name = "sleep_tracker"
     buckets = buckets_api.find_buckets().buckets
     if not any(bucket.name == bucket_name for bucket in buckets):
         buckets_api.create_bucket(bucket_name=bucket_name)

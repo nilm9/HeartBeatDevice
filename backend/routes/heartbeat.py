@@ -2,7 +2,7 @@ import pandas as pd
 from flask import Blueprint, request, jsonify
 from datetime import datetime
 from influxdb import InfluxDBClient
-from backend.real_time_processing import RealTimePreprocessor  # Assuming you have real-time processing setup
+from backend.real_time_processing import PreprocessFunction  # Assuming you have real-time processing setup
 
 heartbeat_bp = Blueprint('heartbeat', __name__)
 
@@ -11,7 +11,7 @@ client = InfluxDBClient(host='localhost', port=8086)
 client.switch_database('sleep_tracker')
 
 # Real-time preprocessor instance
-preprocessor = RealTimePreprocessor()
+preprocessor = PreprocessFunction()
 
 
 @heartbeat_bp.route('/heartbeat', methods=['POST'])
