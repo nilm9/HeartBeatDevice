@@ -1,7 +1,18 @@
-from kafka import KafkaConsumer
-from kafka import KafkaProducer
+# kafka_consumer.py
+from kafka import KafkaConsumer, KafkaProducer
 import json
+import logging
 import time
+from dotenv import load_dotenv
+import os
+from backend.thingspeak import read_from_thingspeak
+
+# Set up logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Consumer configuration
 consumer = KafkaConsumer(
@@ -20,7 +31,6 @@ producer = KafkaProducer(
 )
 
 def preprocess(data):
-    # Example preprocessing: parse JSON, calculate features
     timestamp = data['timestamp']
     heart_rate = data['heart_rate']
 
@@ -39,8 +49,16 @@ def preprocess(data):
 
     return processed_data
 
-for message in consumer:
-    data = message.value
-    processed_data = preprocess(data)
-    producer.send('processed_sleep_tracker', value=processed_data)
-    time.sleep(1)  # Sleep to simulate processing time
+# Main processing loop
+def main():
+    while True:
+        data = read_from_thingspeak()
+        if data:
+            for record in data:
+                processed_data = preprocess(record)
+                producer.send('processed_sleep_tracker', value=processed_data)
+                logger.debug(f"Processed and sent: {processed_data}")
+                time.sleep(1)  # Sleep to simulate processing time
+
+if __name__ == "__main__":
+    main()

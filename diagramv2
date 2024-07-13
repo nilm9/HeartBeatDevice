@@ -1,0 +1,34 @@
+[ Sleep Tracker ]
+       |
+       | (Heart Rate Data)
+       v
+[ MQTT Broker ]
+       |
+       | (Heart Rate Data Stream)
+       v
+[ Data Ingestion Module ]
+       |
+       |-------------------------------------|
+       |                                     |
+       v                                     v
+[ Firebase (User Preferences) ]      [ ThinkSpeak (Time-Series Data) ]
+       |                                     |
+       v                                     v
+[ Backend Server ]                       [ Real-Time Processing Engine (Kafka) ]
+       |                                     |
+       | (User Preferences, etc.)            | (Preprocessed Data)
+       |                                     |
+       |                                     v
+       |                           [ Algorithm/Machine Learning Model ]
+       |                                     |
+       |                                     | (Sleep Stages)
+       |                                     v
+       |                           [ Wake-Up Decision Module ]
+       |                                     |
+       |                                     | (Optimal Wake-Up Time)
+       |                                     v
+       |                           [ Notification System ]
+       |                                     |
+       | (Notification)                      |
+       v                                     v
+[ User Device (Notification) ]         [ User Device (Notification) ]

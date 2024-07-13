@@ -1,0 +1,10 @@
+{
+    "user_id": "user123",
+    "wake_up_window_start": "07:00",
+    "wake_up_window_end": "08:00",
+    "email": "user123@example.com",
+    "preferences": {
+        "notification": "email",
+        "timezone": "UTC"
+    }
+}

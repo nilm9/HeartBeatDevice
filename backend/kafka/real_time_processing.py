@@ -1,7 +1,14 @@
+# real_time_processing.py
 from pyflink.datastream import StreamExecutionEnvironment
-from pyflink.datastream.functions import ProcessFunction, RuntimeContext
+from pyflink.datastream.functions import ProcessFunction
 from pyflink.common.typeinfo import Types
 import json
+import logging
+from backend.thingspeak import read_from_thingspeak
+
+# Set up logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 class PreprocessFunction(ProcessFunction):
 
@@ -29,20 +36,23 @@ def main():
     env = StreamExecutionEnvironment.get_execution_environment()
     env.set_parallelism(1)
 
-    data_stream = env.from_collection(
-        [
-            '{"timestamp": 1622548800, "heart_rate": 75}',
-            '{"timestamp": 1622548810, "heart_rate": 76}',
-            '{"timestamp": 1622548820, "heart_rate": 77}'
-        ],
-        type_info=Types.STRING()
-    )
+    # Fetch data from ThingSpeak
+    data = read_from_thingspeak()
 
-    processed_stream = data_stream.process(PreprocessFunction(), output_type=Types.STRING())
+    if data:
+        # Convert the data to the format expected by the stream
+        data_stream = env.from_collection(
+            [json.dumps(record) for record in data],
+            type_info=Types.STRING()
+        )
 
-    processed_stream.print()
+        processed_stream = data_stream.process(PreprocessFunction(), output_type=Types.STRING())
 
-    env.execute("Real-Time Processing Job")
+        processed_stream.print()
+
+        env.execute("Real-Time Processing Job")
+    else:
+        logger.error("No data retrieved from ThingSpeak.")
 
 if __name__ == '__main__':
     main()
