@@ -236,16 +236,13 @@ Confusion Matrix:
 - **Role**: Frontend Development and Firebase Integration
   - Developed the frontend application for user interaction.
   - Integrated Firebase for authentication and real-time database functionality.
-- **LinkedIn**: *LinkedIn profile link*
-- **GitHub**: *GitHub profile link*
-
+    
 ### Nil Monfort
 - **Role**: System Architecture and Backend Development
   - Designed the overall system architecture.
   - Implemented backend services and machine learning models.
   - Managed the deployment and integration of various components.
-- **LinkedIn**: *Your LinkedIn profile link*
-- **GitHub**: *Your GitHub profile link*
+- **LinkedIn**:  [Nil Monfort](https://www.linkedin.com/in/nil-monfort-761660213/)
 
 ## Contribution Guidelines
 
