@@ -1,10 +1,11 @@
-# kafka_consumer.py
 from kafka import KafkaConsumer, KafkaProducer
 import json
 import logging
 import time
 from dotenv import load_dotenv
 import os
+import signal
+import sys
 from backend.thingspeak import read_from_thingspeak
 
 # Set up logging
@@ -31,8 +32,8 @@ producer = KafkaProducer(
 )
 
 def preprocess(data):
-    timestamp = data['timestamp']
-    heart_rate = data['heart_rate']
+    timestamp = data['created_at']  # Adjusted to match the key in ThingSpeak data
+    heart_rate = float(data['field2'])  # Adjusted to match the key in ThingSpeak data and convert to float
 
     # Calculate HRV, rolling averages, etc. (simplified example)
     hrv = heart_rate / 2  # Replace with actual HRV calculation
@@ -49,16 +50,35 @@ def preprocess(data):
 
     return processed_data
 
+def signal_handler(sig, frame):
+    logger.info('Shutting down gracefully...')
+    consumer.close()
+    producer.close()
+    sys.exit(0)
+
+# Add signal handlers for graceful shutdown
+signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
+
 # Main processing loop
 def main():
     while True:
-        data = read_from_thingspeak()
-        if data:
-            for record in data:
-                processed_data = preprocess(record)
-                producer.send('processed_sleep_tracker', value=processed_data)
-                logger.debug(f"Processed and sent: {processed_data}")
-                time.sleep(1)  # Sleep to simulate processing time
+        try:
+            data = read_from_thingspeak()
+            if data:
+                for record in data:
+                    try:
+                        processed_data = preprocess(record)
+                        producer.send('processed_sleep_tracker', value=processed_data)
+                        logger.debug(f"Processed and sent: {processed_data}")
+                    except KeyError as e:
+                        logger.error(f"Missing expected key: {e}")
+                    except ValueError as e:
+                        logger.error(f"Invalid value encountered: {e}")
+                    time.sleep(1)  # Sleep to simulate processing time
+        except Exception as e:
+            logger.error(f"An error occurred: {e}")
+            time.sleep(5)  # Sleep before retrying in case of error
 
 if __name__ == "__main__":
     main()

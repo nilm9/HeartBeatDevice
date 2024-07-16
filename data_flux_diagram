@@ -1,0 +1,53 @@
++-------------------------------------+
+|          ThingSpeak Channel         |
+| (Heart Rate Data Source from API)   |
++--------------------+----------------+
+                     |
+                     |
+                     v
++--------------------+----------------+
+|    Kafka Producer (Data Ingestion)  |
+|  - Reads data from ThingSpeak       |
+|  - Sends data to Kafka topic        |
++--------------------+----------------+
+                     |
+                     |
+                     v
++--------------------+----------------+
+|   Kafka Topic: sleep_tracker        |
++--------------------+----------------+
+                     |
+                     |
+                     v
++--------------------+----------------+
+|  Kafka Consumer (Preprocessing)     |
+|  - Consumes raw data from Kafka     |
+|  - Preprocesses data                |
+|  - Sends preprocessed data to       |
+|    processed_sleep_tracker topic    |
++--------------------+----------------+
+                     |
+                     |
+                     v
++--------------------+----------------+
+|   Kafka Topic: processed_sleep_tracker |
++--------------------+----------------+
+                     |
+                     |
+                     v
++--------------------+----------------+
+| Kafka Consumer (Wake-Up Logic)      |
+|  - Consumes preprocessed data       |
+|  - Checks against wake-up window    |
+|  - Detects sleep stage              |
+|  - Sends notification if condition  |
+|    met                              |
++--------------------+----------------+
+                     |
+                     |
+                     v
++--------------------+----------------+
+|  Notification Service (Email)       |
+|  - Sends wake-up notification to    |
+|    user                             |
++-------------------------------------+

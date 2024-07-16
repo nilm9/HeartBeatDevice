@@ -4,6 +4,9 @@ from pyflink.datastream.functions import ProcessFunction
 from pyflink.common.typeinfo import Types
 import json
 import logging
+import time
+import signal
+import sys
 from backend.thingspeak import read_from_thingspeak
 
 # Set up logging
@@ -14,8 +17,14 @@ class PreprocessFunction(ProcessFunction):
 
     def process_element(self, value, ctx: 'ProcessFunction.Context'):
         data = json.loads(value)
-        timestamp = data['timestamp']
-        heart_rate = data['heart_rate']
+        timestamp = data['created_at']
+        heart_rate = data['field2']
+
+        try:
+            heart_rate = float(heart_rate)
+        except ValueError:
+            logger.error(f"Invalid heart rate value: {heart_rate}")
+            return
 
         # Calculate HRV, rolling averages, etc. (simplified example)
         hrv = heart_rate / 2  # Replace with actual HRV calculation
@@ -32,27 +41,41 @@ class PreprocessFunction(ProcessFunction):
 
         yield processed_data
 
+def signal_handler(sig, frame):
+    logger.info('Shutting down gracefully...')
+    sys.exit(0)
+
+# Add signal handlers for graceful shutdown
+signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
+
 def main():
     env = StreamExecutionEnvironment.get_execution_environment()
     env.set_parallelism(1)
 
-    # Fetch data from ThingSpeak
-    data = read_from_thingspeak()
+    while True:
+        try:
+            # Fetch data from ThingSpeak
+            data = read_from_thingspeak()
 
-    if data:
-        # Convert the data to the format expected by the stream
-        data_stream = env.from_collection(
-            [json.dumps(record) for record in data],
-            type_info=Types.STRING()
-        )
+            if data:
+                # Convert the data to the format expected by the stream
+                data_stream = env.from_collection(
+                    [json.dumps(record) for record in data],
+                    type_info=Types.STRING()
+                )
 
-        processed_stream = data_stream.process(PreprocessFunction(), output_type=Types.STRING())
+                processed_stream = data_stream.process(PreprocessFunction(), output_type=Types.STRING())
 
-        processed_stream.print()
+                processed_stream.print()
 
-        env.execute("Real-Time Processing Job")
-    else:
-        logger.error("No data retrieved from ThingSpeak.")
+                env.execute("Real-Time Processing Job")
+            else:
+                logger.error("No data retrieved from ThingSpeak.")
+            time.sleep(60)  # Sleep for a minute before fetching new data
+        except Exception as e:
+            logger.error(f"An error occurred: {e}")
+            time.sleep(5)  # Sleep before retrying in case of error
 
 if __name__ == '__main__':
     main()

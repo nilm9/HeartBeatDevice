@@ -1,10 +1,15 @@
+import os
+
 from kafka import KafkaProducer
 import json
 import time
 
+# Ensure sensitive configurations are loaded from environment variables
+bootstrap_servers = os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'localhost:9092')
+
 # Producer configuration
 producer = KafkaProducer(
-    bootstrap_servers=['localhost:9092'],
+    bootstrap_servers=[bootstrap_servers],
     value_serializer=lambda x: json.dumps(x).encode('utf-8')
 )
 
